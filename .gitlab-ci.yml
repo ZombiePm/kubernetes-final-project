@@ -1,0 +1,32 @@
+stages:
+  - build
+  - push
+  - deploy
+
+build_container:
+  stage: build
+  script:
+    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+    - docker build -t "loadgenerator:$GIT_COMMIT_SHA" src/loadgenerator/
+    - echo "Built image loadgenerator:$GIT_COMMIT_SHA"
+
+push_container:
+  stage: push
+  script:
+    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+    # Раскомментируйте для реального пуша:
+    # docker tag "loadgenerator:$GIT_COMMIT_SHA" your-registry.com/loadgenerator:$GIT_COMMIT_SHA
+    # docker push your-registry.com/loadgenerator:$GIT_COMMIT_SHA
+    - echo "Would push image loadgenerator:$GIT_COMMIT_SHA to container registry"
+
+deploy:
+  stage: deploy
+  script:
+    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+    - helm upgrade --install loadgenerator ./helm-loadgenerator --set "image.tag=$GIT_COMMIT_SHA" --namespace default
+    - echo "Deployed loadgenerator with image tag $GIT_COMMIT_SHA"
+
+# Optional: trigger pipeline only on master
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
