@@ -3,30 +3,42 @@ stages:
   - push
   - deploy
 
+variables:
+  IMAGE_NAME: loadgenerator
+
+# --- Build Stage ---
 build_container:
   stage: build
+  image: docker:24
+  services:
+    - docker:dind
   script:
-    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
-    - docker build -t "loadgenerator:$GIT_COMMIT_SHA" src/loadgenerator/
-    - echo "Built image loadgenerator:$GIT_COMMIT_SHA"
+    - echo "Building Docker image..."
+    - docker build -t "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" src/loadgenerator/
+    - echo "Built image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
 
+# --- Push Stage ---
 push_container:
   stage: push
+  image: docker:24
+  services:
+    - docker:dind
   script:
-    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+    - echo "Pushing Docker image..."
     # Раскомментируйте для реального пуша:
-    # docker tag "loadgenerator:$GIT_COMMIT_SHA" your-registry.com/loadgenerator:$GIT_COMMIT_SHA
-    # docker push your-registry.com/loadgenerator:$GIT_COMMIT_SHA
-    - echo "Would push image loadgenerator:$GIT_COMMIT_SHA to container registry"
+    # docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" your-registry.com/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    # docker push your-registry.com/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - echo "Would push image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA to container registry"
 
+# --- Deploy Stage ---
 deploy:
   stage: deploy
+  image: alpine/helm:3.12.1
   script:
-    - GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
-    - helm upgrade --install loadgenerator ./helm-loadgenerator --set "image.tag=$GIT_COMMIT_SHA" --namespace default
-    - echo "Deployed loadgenerator with image tag $GIT_COMMIT_SHA"
+    - echo "Deploying $IMAGE_NAME:$CI_COMMIT_SHORT_SHA to Kubernetes"
+    - helm upgrade --install "$IMAGE_NAME" ./helm-loadgenerator --set "image.tag=$CI_COMMIT_SHORT_SHA" --namespace default
 
-# Optional: trigger pipeline only on master
+# --- Trigger pipeline only on master ---
 workflow:
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
