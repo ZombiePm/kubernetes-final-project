@@ -1,10 +1,23 @@
+default:
+  image: docker:24.0.5-cli
+  services:
+    - name: docker:24.0.5-dind
+      variables:
+        HEALTHCHECK_TCP_PORT: "2376"
+  before_script:
+    - docker info
+
+variables:
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+  IMAGE_NAME: loadgenerator
+
 stages:
   - build
   - push
   - deploy
-
-variables:
-  IMAGE_NAME: loadgenerator
 
 # --- Build Stage ---
 build_container:
