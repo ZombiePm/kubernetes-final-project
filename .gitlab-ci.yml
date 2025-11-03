@@ -39,12 +39,9 @@ push_container:
     - name: docker:28.5-dind
   script:
     - echo "Pushing Docker image..."
-    - docker version
-    # Пример для реального push в registry:
-    # docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    # docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
-    # docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
-    - echo "Would push image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA to container registry"
+    - docker login -u "dummy" -p "dummy" registry-docker-registry.registry.svc.cluster.local:5000
+    - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 
 # --- Deploy Stage ---
 deploy:
