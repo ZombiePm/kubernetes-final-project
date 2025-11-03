@@ -1,7 +1,7 @@
 default:
-  image: docker:24.0.5-cli
+  image: docker:28.5-cli
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.5-dind
       variables:
         HEALTHCHECK_TCP_PORT: "2376"
   before_script:
@@ -31,8 +31,14 @@ build_container:
 
 deploy:
   stage: deploy
-  image: alpine/helm:3.12.1
+  image: docker:28.5
+  services:
+    - name: docker:28.5-dind
   script:
+    - apk add --no-cache curl tar gzip bash \
+      && curl -sSL https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz | tar -xz \
+      && mv linux-amd64/helm /usr/local/bin/helm \
+      && rm -rf linux-amd64
     - echo "Deploying $IMAGE_NAME:$CI_COMMIT_SHORT_SHA to Kubernetes"
     - helm upgrade --install "$IMAGE_NAME" ./helm-loadgenerator --set "image.tag=$CI_COMMIT_SHORT_SHA" --namespace default
 
