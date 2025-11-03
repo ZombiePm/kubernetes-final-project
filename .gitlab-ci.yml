@@ -27,8 +27,8 @@ build_container:
   script:
     - echo "Building Docker image..."
     - docker version
-    - docker build -t "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" src/loadgenerator/
-    - echo "Built image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
+    - docker build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" src/loadgenerator/
+    - echo "Built image $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
 
 # --- Push Stage ---
 push_container:
