@@ -12,8 +12,6 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_TLS_VERIFY: 1
   DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-  IMAGE_NAME: loadgenerator
-  DOCKER_INSECURE_REGISTRY: "registry-docker-registry.registry.svc.cluster.local:5000"
 
 stages:
   - build
@@ -35,24 +33,20 @@ build_container:
 # --- Push Stage ---
 push_container:
   stage: push
-  image: docker:28.5
-  services:
-    - name: docker:28.5-dind
   script:
-    - echo "Pushing Docker image..."
-    - echo '{"insecure-registries":["registry-docker-registry.registry.svc.cluster.local:5000"]}' > /etc/docker/daemon.json
-    - docker info
-    - docker login -u dummy -p dummy registry-docker-registry.registry.svc.cluster.local:5000
-    - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
-    - docker push registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - echo "Logging in to GitLab Container Registry..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - echo "Pushed image $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
 
 # --- Deploy Stage ---
 deploy:
   stage: deploy
   image: alpine/helm:3.12.1
   script:
-    - echo "Deploying $IMAGE_NAME:$CI_COMMIT_SHORT_SHA to Kubernetes"
-    - helm upgrade --install "$IMAGE_NAME" ./helm-loadgenerator --set "image.tag=$CI_COMMIT_SHORT_SHA" --namespace default
+    - echo "Deploying $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA to Kubernetes"
+    - helm upgrade --install "$CI_REGISTRY_IMAGE" ./helm-loadgenerator --set "image.tag=$CI_COMMIT_SHORT_SHA" --namespace default
 
 # --- Trigger pipeline only on master ---
 workflow:
