@@ -5,8 +5,6 @@ stages:
 
 variables:
   IMAGE_NAME: loadgenerator
-  DOCKER_TLS_CERTDIR: ""  # отключаем TLS, иначе не подключится к docker:dind
-  DOCKER_HOST: tcp://docker:2375  # docker:dind сервис доступен по имени "docker"
 
 # --- Build Stage ---
 build_container:
