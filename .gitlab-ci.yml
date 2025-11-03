@@ -16,7 +16,8 @@ stages:
 
 deploy:
   stage: deploy
-  image: alpine/helm:3.12.1
+  image: alpine/helm:3
+
   script:
     - mkdir -p ~/.kube
     - echo "$KUBECONFIG_CONTENT" > ~/.kube/config
