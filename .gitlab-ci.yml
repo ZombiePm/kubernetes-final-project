@@ -39,7 +39,7 @@ push_container:
     - name: docker:28.5-dind
   script:
     - echo "Pushing Docker image..."
-    - docker login -u "dummy" -p "dummy" registry-docker-registry.registry.svc.cluster.local:5000
+    - docker login registry-docker-registry.registry.svc.cluster.local:5000
     - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker push registry-docker-registry.registry.svc.cluster.local:5000/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 
