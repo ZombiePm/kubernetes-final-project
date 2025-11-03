@@ -20,7 +20,7 @@ deploy:
 
   script:
     - mkdir -p ~/.kube
-    - echo "$KUBECONFIG_CONTENT" > ~/.kube/config
+    - echo "$KUBECONFIG_CONTENT" | base64 -d > ~/.kube/config
     - chmod 600 ~/.kube/config
     - helm upgrade --install loadgenerator ./helm-loadgenerator --namespace default
 
