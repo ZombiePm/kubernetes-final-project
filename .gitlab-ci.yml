@@ -4,8 +4,6 @@ default:
     - name: docker:28.5-dind
       variables:
         HEALTHCHECK_TCP_PORT: "2376"
-  before_script:
-    - docker info
 
 variables:
   DOCKER_HOST: tcp://docker:2376
