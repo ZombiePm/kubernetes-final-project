@@ -12,9 +12,6 @@ build_container:
   image: docker:28.5
   services:
     - name: docker:28.5-dind
-  variables:
-    DOCKER_HOST: "unix:///var/run/docker.sock"
-    DOCKER_TLS_CERTDIR: ""
   script:
     - echo "Building Docker image..."
     - docker version
@@ -27,9 +24,6 @@ push_container:
   image: docker:28.5
   services:
     - name: docker:28.5-dind
-  variables:
-    DOCKER_HOST: "unix:///var/run/docker.sock"
-    DOCKER_TLS_CERTDIR: ""
   script:
     - echo "Pushing Docker image..."
     - docker version
