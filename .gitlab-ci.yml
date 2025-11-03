@@ -16,7 +16,6 @@ variables:
 
 stages:
   - build
-  - push
   - deploy
 
 # --- Build Stage ---
@@ -27,21 +26,9 @@ build_container:
     - name: docker:28.5-dind
   script:
     - echo "Building Docker image..."
-    - docker version
     - docker build -t "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" src/loadgenerator/
     - echo "Built image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
 
-# --- Push Stage ---
-push_container:
-  stage: push
-  script:
-    - echo "Logging in to GitLab Container Registry..."
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
-    - docker push "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
-    - echo "Pushed image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
-
-# --- Deploy Stage ---
 deploy:
   stage: deploy
   image: alpine/helm:3.12.1
