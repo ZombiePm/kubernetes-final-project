@@ -21,7 +21,7 @@ serviceAccount:
   name: ""
 
 env:
-  FRONTEND_ADDR: "frontend.csjob.ru:443"
+  FRONTEND_ADDR: "frontend.csjob.ru"
   USERS: "10"
 
 resources:
