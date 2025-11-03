@@ -11,10 +11,6 @@ variables:
 # --- Build Stage ---
 build_container:
   stage: build
-  image: docker:24
-  services:
-    - name: docker:24-dind
-      alias: docker
   script:
     - echo "Building Docker image..."
     - docker version
@@ -24,10 +20,6 @@ build_container:
 # --- Push Stage ---
 push_container:
   stage: push
-  image: docker:24
-  services:
-    - name: docker:24-dind
-      alias: docker
   script:
     - echo "Pushing Docker image..."
     - docker version
