@@ -18,6 +18,9 @@ deploy:
   stage: deploy
   image: alpine/helm:3.12.1
   script:
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_CONTENT" > ~/.kube/config
+    - chmod 600 ~/.kube/config
     - helm upgrade --install loadgenerator ./helm-loadgenerator --namespace default
 
 workflow:
