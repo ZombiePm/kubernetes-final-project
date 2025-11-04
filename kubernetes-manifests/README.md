@@ -6,3 +6,6 @@ insert the correct `image:` tags.
 
 Use the manifests in [/release](/release) directory which are configured with
 pre-built public images.
+
+# Горизонтальное масштабирование HorizontalPodAutoscaler
+kubectl apply -f kubernetes-manifests/frontend-hpa.yaml
