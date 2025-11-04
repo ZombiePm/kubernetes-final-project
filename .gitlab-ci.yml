@@ -42,10 +42,10 @@ deploy:
     - mkdir -p ~/.kube
     - echo "$KUBECONFIG_CONTENT" | base64 -d > ~/.kube/config
     - chmod 600 ~/.kube/config
-    - helm upgrade --install $IMAGE_NAME ./helm-loadgenerator  \
-      --set image.repository=$REGISTRY/$IMAGE_NAME \
-      --set image.tag=$CI_COMMIT_SHORT_SHA \
-      --set image.pullPolicy=IfNotPresent \
+    - helm upgrade --install "$IMAGE_NAME" ./helm-loadgenerator\
+      --set image.repository="$REGISTRY/$IMAGE_NAME"\
+      --set image.tag="$CI_COMMIT_SHORT_SHA"\
+      --set image.pullPolicy=IfNotPresent\
       --namespace default --create-namespace
 
 workflow:
