@@ -11,7 +11,7 @@ variables:
   DOCKER_TLS_VERIFY: 1
   DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
   IMAGE_NAME: "loadgenerator"
-  REGISTRY: "docker-registry.registry.svc.cluster.local:5000"
+  REGISTRY: "registry.csjob.ru"
 
 stages:
   - build
@@ -39,7 +39,7 @@ push_container:
     - name: docker:28.5-dind
   script:
     - echo "Pushing Docker image..."
-    - docker login --insecure-registry $REGISTRY -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD
+    - docker login $REGISTRY -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD
     - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 
