@@ -39,7 +39,7 @@ push_container:
     - name: docker:28.5-dind
   script:
     - echo "Pushing Docker image..."
-    - docker login $REGISTRY -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD
+    - docker login --insecure-registry $REGISTRY -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD
     - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 
