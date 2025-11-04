@@ -5,7 +5,6 @@ kubectl create secret generic registry-auth-secret \
 -n registry
 helm upgrade --install docker-registry twuni/docker-registry \
 -n registry --create-namespace \
---set persistence.enabled=true \
 --set secrets.htpasswdSecret=registry-auth-secret
 
 ## Подключение
