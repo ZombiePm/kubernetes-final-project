@@ -1,0 +1,41 @@
+name: Load Generator CI/CD Pipeline
+
+stages:
+  - build:
+      name: Build Container
+      steps:
+        - name: Build Docker Image
+          script: |
+            # Build the Docker image with a tag based on git commit SHA
+            GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+            docker build -t loadgenerator:$GIT_COMMIT_SHA src/loadgenerator/
+            echo "Built image: loadgenerator:$GIT_COMMIT_SHA"
+            
+  - push:
+      name: Push Container
+      steps:
+        - name: Push to Container Registry
+          script: |
+            # Tag and push to container registry
+            GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+            # In a real scenario, you would tag with your registry URL
+            # docker tag loadgenerator:$GIT_COMMIT_SHA your-registry.com/loadgenerator:$GIT_COMMIT_SHA
+            # docker push your-registry.com/loadgenerator:$GIT_COMMIT_SHA
+            echo "Would push image loadgenerator:$GIT_COMMIT_SHA to container registry"
+            
+  - deploy:
+      name: Deploy to Kubernetes
+      steps:
+        - name: Deploy with Helm
+          script: |
+            # Deploy using Helm chart with updated image tag
+            GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+            helm upgrade --install loadgenerator ./helm-loadgenerator \
+              --set image.tag=$GIT_COMMIT_SHA \
+              --namespace default
+            echo "Deployed loadgenerator with image tag: $GIT_COMMIT_SHA"
+
+# This pipeline would be triggered on every commit to the master branch
+triggers:
+  - on_commit:
+      branch: master

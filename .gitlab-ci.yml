@@ -1,0 +1,49 @@
+default:
+  image: docker:28.5-cli
+  services:
+    - name: docker:28.5-dind
+      variables:
+        HEALTHCHECK_TCP_PORT: "2376"
+
+variables:
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+  IMAGE_NAME: "loadgenerator"
+  REGISTRY: "registry.csjob.ru"
+
+stages:
+  - build_push
+  - deploy
+
+
+# --- Build Stage ---
+build_container:
+  stage: build_push
+  image: docker:28.5
+  services:
+    - name: docker:28.5-dind
+  script:
+    - echo "Building Docker image..."
+    - docker version
+    - docker build -t "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" src/loadgenerator/
+    - echo "Built image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
+    - echo "Pushing Docker image..."
+    - docker login $REGISTRY -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD
+    - docker tag "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+
+# --- Deploy Stage ---
+deploy:
+  stage: deploy
+  image: alpine/helm:3
+  script:
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_CONTENT" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
+    - helm upgrade --install "$IMAGE_NAME" ./helm-loadgenerator --set image.repository="$REGISTRY/$IMAGE_NAME" --set image.tag="$CI_COMMIT_SHORT_SHA" --set image.pullPolicy=IfNotPresent --namespace default --create-namespace --set env.USERS="200"
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
