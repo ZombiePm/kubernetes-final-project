@@ -1,0 +1,64 @@
+# Complete unified values for kube-prometheus-stack with Loki integration
+# This configuration enables Prometheus monitoring and adds Loki as a datasource in Grafana
+
+# Grafana configuration with Loki datasource
+grafana:
+  enabled: true
+  sidecar:
+    datasources:
+      enabled: true
+      isDefaultDatasource: false  # Don't make Prometheus the default datasource
+      # Add Loki as a datasource
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki:3100
+          jsonData:
+            maxLines: 1000
+          isDefault: true  # Make Loki the default datasource
+          uid: loki
+  # You can customize other Grafana settings here if needed
+  # adminUser: admin
+  # adminPassword: strongpassword
+
+# Prometheus configuration (enabled by default)
+prometheus:
+  enabled: true
+  prometheusSpec:
+    # You can customize Prometheus settings here if needed
+    retention: 10d
+    # storageSpec:
+    #   volumeClaimTemplate:
+    #     spec:
+    #       storageClassName: fast
+    #       resources:
+    #         requests:
+    #           storage: 20Gi
+
+# Alertmanager configuration (enabled by default)
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    # You can customize Alertmanager settings here if needed
+    retention: 120h
+
+# Node Exporter configuration (enabled by default)
+nodeExporter:
+  enabled: true
+
+# Kube State Metrics configuration (enabled by default)
+kubeStateMetrics:
+  enabled: true
+
+# Kubelet Service Monitor configuration (enabled by default)
+kubelet:
+  enabled: true
+
+# Kubernetes API Server Service Monitor configuration (enabled by default)
+kubeApiServer:
+  enabled: true
+
+# Other Kubernetes service monitors (enabled by default)
+kubernetesServiceMonitors:
+  enabled: true

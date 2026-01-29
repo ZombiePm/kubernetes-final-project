@@ -1,0 +1,30 @@
+gitlabUrl: "https://gitlab.skillbox.ru/"
+runnerRegistrationToken: "GR1348941R2NRRQApGkCCq3WUjMcb"
+
+runners:
+  tags: ""
+  config: |
+    [[runners]]
+      [runners.kubernetes]
+        image = "ubuntu:20.04"
+        privileged = true
+      [[runners.kubernetes.volumes.empty_dir]]
+        name = "docker-certs"
+        mount_path = "/certs/client"
+        medium = "Memory"
+
+serviceAccount:
+  create: true
+  name: gitlab-runner
+
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "secrets", "configmaps"]
+      verbs: ["get","list","watch","create","delete","update","patch"]
+    - apiGroups: ["batch"]
+      resources: ["jobs"]
+      verbs: ["get","list","watch","create","delete","update","patch"]
+
+concurrent: 10

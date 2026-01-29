@@ -1,0 +1,51 @@
+# Default values for loadgenerator.
+# This is a YAML-formatted file.
+
+replicaCount: 1
+
+image:
+  repository: gcr.io/google-samples/microservices-demo/loadgenerator
+  tag: "v0.10.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+env:
+  FRONTEND_ADDR: "frontend.csjob.ru"
+  USERS: "10"
+
+resources:
+  requests:
+    cpu: 300m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+initContainers:
+  checkFrontendInitContainer: true
+  image: busybox:latest
+
+securityContext:
+  fsGroup: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  privileged: false
+  readOnlyRootFilesystem: true
